@@ -21,7 +21,7 @@ public class Parser {
 
     public Parser(String projectPath) {
         this.projectPath = projectPath;
-        this.sourcePath = projectPath + File.separator;
+        this.sourcePath = projectPath + File.separator + "src" + File.separator + "main" + File.separator + "java";
         this.jrePath = System.getProperty("java.home") + File.separator + "lib" + File.separator + "rt.jar";
     }
 

@@ -1,33 +1,81 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-<modelVersion>4.0.0</modelVersion>
-<groupId>org.example</groupId>
-<artifactId>TP1_HAI913I</artifactId>
-<version>1.0-SNAPSHOT</version>
-<properties>
-<maven.compiler.source>8</maven.compiler.source>
-<maven.compiler.target>8</maven.compiler.target>
-<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-</properties>
-<dependencies>
-<dependency>
-<groupId>org.eclipse.tycho</groupId>
-<artifactId>org.eclipse.jdt.core</artifactId>
-<version>3.9.1.v20130905-0837</version>
-</dependency>
-<dependency>
-<groupId>org.eclipse.core</groupId>
-<artifactId>runtime</artifactId>
-<version>3.9.100-v20131218-1515</version>
-</dependency>
-<dependency>
-<groupId>org.eclipse.birt.runtime</groupId>
-<artifactId>org.eclipse.core.resources</artifactId>
-<version>3.8.101.v20130717-0806</version>
-</dependency>
-<dependency>
-<groupId>commons-io</groupId>
-<artifactId>commons-io</artifactId>
-<version>2.11.0</version>
-</dependency>
-</dependencies>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.example</groupId>
+    <artifactId>TP1_HAI913I</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <!-- Version du JDK -->
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <javafx.version>21.0.2</javafx.version> <!--version JavaFX -->
+        <javafx.platform>mac</javafx.platform>
+    </properties>
+
+    <dependencies>
+
+        <!-- Librairies Eclipse JDT (analyse AST) -->
+        <dependency>
+            <groupId>org.eclipse.jdt</groupId>
+            <artifactId>org.eclipse.jdt.core</artifactId>
+            <version>3.32.0</version> <!-- version récente -->
+        </dependency>
+
+        <!-- Utilitaire pour lire les fichiers -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+
+        <!-- Interface JavaFX -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>${javafx.platform}</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>${javafx.platform}</classifier>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+
+            <!-- Plugin JavaFX -->
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <configuration>
+                    <mainClass>ui.MainFX</mainClass>
+                </configuration>
+            </plugin>
+
+            <!-- Plugin compiler -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
 </project>

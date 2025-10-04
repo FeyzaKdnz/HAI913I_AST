@@ -1,0 +1,12 @@
+ui/MainApp.class
+analyser/StatisticsCollector.class
+analyser/StatisticsCollector$MethodStats.class
+analyser/visitors/TypeDeclarationVisitor.class
+analyser/Parser.class
+ui/MainFX.class
+analyser/visitors/MethodInvocationVisitor.class
+analyser/visitors/FieldDeclarationVisitor.class
+ui/MainFX$1.class
+analyser/visitors/MethodDeclarationVisitor.class
+analyser/CallGraphBuilder.class
+analyser/StatisticsCollector$ClassStats.class

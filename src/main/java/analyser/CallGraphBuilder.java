@@ -9,12 +9,11 @@ import java.util.*;
 
 public class CallGraphBuilder {
 
-    // Graphe d’appel : clé = méthode appelante, valeur = méthodes appelées
+    // Graphe d’appel: clé = méthode appelante, valeur = méthodes appelées
     private final Map<String, Set<String>> callGraph = new HashMap<>();
 
-    /**
-     * Construit le graphe d’appel à partir d’une liste de CompilationUnit.
-     */
+    /** Construit le graphe d’appel à partir d’une liste de CompilationUnit. **/
+    
     public void build(List<CompilationUnit> units) {
         for (CompilationUnit unit : units) {
             TypeDeclarationVisitor typeVisitor = new TypeDeclarationVisitor();
@@ -45,9 +44,7 @@ public class CallGraphBuilder {
         return callGraph;
     }
 
-    /**
-     * Affiche le graphe d’appel.
-     */
+    /*** Affiche le graphe d’appel. ***/
     public void printGraph() {
         callGraph.forEach((caller, callees) -> {
             System.out.println(caller + " appelle : " + callees);

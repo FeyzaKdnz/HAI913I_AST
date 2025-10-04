@@ -3,8 +3,8 @@ package ui;
 import analyser.Parser;
 import analyser.StatisticsCollector;
 import analyser.CallGraphBuilder;
-
 import org.eclipse.jdt.core.dom.CompilationUnit;
+
 import java.util.List;
 
 public class MainApp {
@@ -13,18 +13,20 @@ public class MainApp {
             System.err.println("Usage: java MainApp <chemin_projet>");
             return;
         }
-        
+
         String projectPath = args[0];
         System.out.println("Projet analysé: " + projectPath);
 
         Parser parser = new Parser(projectPath);
         List<CompilationUnit> units = parser.parseProject();
-        System.out.println("Nombre de fichiers parsés: " + units.size());
+        System.out.println("Fichiers parsés: " + units.size());
 
+        // LANCEMENT DE L'ANALYSE
         StatisticsCollector stats = new StatisticsCollector(units);
         stats.collect();
         System.out.println(stats.generateReport());
-        
+
+        // GRAPHE D'APPEL
         CallGraphBuilder builder = new CallGraphBuilder();
         builder.build(units);
         builder.printGraph();
