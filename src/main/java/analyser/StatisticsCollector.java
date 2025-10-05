@@ -178,4 +178,26 @@ public class StatisticsCollector {
             this.parameterCount = parameterCount;
         }
     }
+
+    public Map<String, Integer> getStatsMap() {
+    Map<String, Integer> stats = new LinkedHashMap<>();
+    stats.put("Nombre de classes", classes.size());
+    stats.put("Nombre de packages", packages.size());
+    int totalMethods = classes.values().stream().mapToInt(c -> c.methodCount).sum();
+    int totalAttributes = classes.values().stream().mapToInt(c -> c.attributeCount).sum();
+    int totalLines = classes.values().stream().mapToInt(c -> c.lineCount).sum();
+    stats.put("Nombre total de méthodes", totalMethods);
+    stats.put("Nombre total d'attributs", totalAttributes);
+    stats.put("Nombre total de lignes", totalLines);
+
+    // Ajout des moyennes (arrondies)
+    if (!classes.isEmpty()) {
+        stats.put("Moyenne de méthodes par classe", (int)Math.round((double)totalMethods / classes.size()));
+        stats.put("Moyenne d'attributs par classe", (int)Math.round((double)totalAttributes / classes.size()));
+    }
+    if (totalMethods > 0) {
+        stats.put("Moyenne de lignes par méthode", (int)Math.round((double)totalLines / totalMethods));
+    }
+    return stats;
+}
 }
