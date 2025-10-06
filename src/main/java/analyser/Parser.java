@@ -28,6 +28,7 @@ public class Parser {
     /**
      * Parse tout le projet et renvoie une liste de CompilationUnit (AST par fichier Java).
      */
+    
     public List<CompilationUnit> parseProject() throws IOException {
         List<File> javaFiles = listJavaFiles(new File(sourcePath));
         List<CompilationUnit> units = new ArrayList<>();
@@ -67,7 +68,7 @@ public class Parser {
      * Construit un AST (CompilationUnit) pour une classe donnée.
      */
     private CompilationUnit parse(char[] source) {
-        ASTParser parser = ASTParser.newParser(AST.JLS4); // Java 8+, peut être JLS17 si dispo
+        ASTParser parser = ASTParser.newParser(AST.JLS4);
         parser.setKind(ASTParser.K_COMPILATION_UNIT);
         parser.setResolveBindings(true);
         parser.setBindingsRecovery(true);

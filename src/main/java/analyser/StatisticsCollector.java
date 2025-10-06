@@ -20,13 +20,13 @@ public class StatisticsCollector {
         this.units = units;
     }
 
-    /**
-     * Lance l’analyse et remplit la map `classes` + liste des packages.
-     */
+    /** Lance l’analyse et remplit la map "classes" + liste des packages **/
+    
     public void collect() {
         for (CompilationUnit unit : units) {
 
             // Enregistrer les packages rencontrés
+        	
             PackageDeclaration pkg = unit.getPackage();
             if (pkg != null) {
                 packages.add(pkg.getName().getFullyQualifiedName());
@@ -67,9 +67,8 @@ public class StatisticsCollector {
         }
     }
 
-    /**
-     * Génère un rapport textuel complet.
-     */
+    /** ---------------------------- GÉNÉRATION D'UN RAPPORT TEXTUEL ---------------------------- **/
+    
     public String generateReport() {
         int totalMethods = classes.values().stream().mapToInt(c -> c.methodCount).sum();
         int totalLines = classes.values().stream().mapToInt(c -> c.lineCount).sum();
@@ -84,34 +83,38 @@ public class StatisticsCollector {
         sb.append("Nombre total d'attributs : ").append(totalAttributes).append("\n");
 
         if (!classes.isEmpty()) {
-            sb.append("Moyenne de méthodes par classe : ")
+            sb.append("Moyenne de méthodes par classe: ")
               .append((double) totalMethods / classes.size()).append("\n");
-            sb.append("Moyenne d'attributs par classe : ")
+            sb.append("Moyenne d'attributs par classe: ")
               .append((double) totalAttributes / classes.size()).append("\n");
-            sb.append("Moyenne de lignes par méthode : ")
+            sb.append("Moyenne de lignes par méthode: ")
               .append(totalMethods > 0 ? (double) totalLines / totalMethods : 0).append("\n");
         }
 
-        // CALCULS AVANCÉS
+        /** ---------------------------- PARTIE CALCULS AVANCÉS ---------------------------- **/
 
         // 10% des classes avec le plus de méthodes
+        
         List<ClassStats> sortedByMethods = new ArrayList<>(classes.values());
         sortedByMethods.sort(Comparator.comparingInt((ClassStats c) -> c.methodCount).reversed());
         int topCount = Math.max(1, (int) Math.ceil(classes.size() * 0.1));
         List<ClassStats> topMethods = sortedByMethods.subList(0, Math.min(topCount, sortedByMethods.size()));
 
         // 10% des classes avec le plus d'attributs
+        
         List<ClassStats> sortedByAttributes = new ArrayList<>(classes.values());
         sortedByAttributes.sort(Comparator.comparingInt((ClassStats c) -> c.attributeCount).reversed());
         List<ClassStats> topAttributes = sortedByAttributes.subList(0, Math.min(topCount, sortedByAttributes.size()));
 
         // Intersection des deux catégories
+        
         Set<String> both = topMethods.stream()
                 .map(c -> c.name)
                 .filter(name -> topAttributes.stream().anyMatch(c -> c.name.equals(name)))
                 .collect(Collectors.toSet());
 
         // Classes avec plus de X méthodes
+        
         int X = 10;
         List<String> moreThanX = classes.values().stream()
                 .filter(c -> c.methodCount > X)
@@ -119,6 +122,7 @@ public class StatisticsCollector {
                 .toList();
 
         // 10% des méthodes les plus longues
+        
         List<MethodStats> allMethods = classes.values().stream()
                 .flatMap(c -> c.methods.stream())
                 .collect(Collectors.toList());
@@ -127,10 +131,12 @@ public class StatisticsCollector {
         List<MethodStats> topLongestMethods = allMethods.subList(0, Math.min(topMethodCount, allMethods.size()));
 
         // Nombre maximal de paramètres parmi toutes les méthodes
+        
         int maxParams = allMethods.stream().mapToInt(m -> m.parameterCount).max().orElse(0);
 
         // === Ajout au rapport ===
-        sb.append("\n--- Analyses avancées ---\n");
+        
+        sb.append("\n--------------- Analyses avancées ---------------\n");
         
         sb.append("Top 10% classes par nb de méthodes : ")
           .append(topMethods.stream().map(c -> c.name).toList()).append("\n");
@@ -156,7 +162,7 @@ public class StatisticsCollector {
 
     public Set<String> getPackages() { return packages; }
 
-    // ================= Classes internes pour stocker les stats =================
+    // Classes internes pour stocker les stats =================
     public static class ClassStats {
         String name;
         int methodCount;

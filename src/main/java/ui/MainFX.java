@@ -46,7 +46,8 @@ public class MainFX extends Application {
     @Override
     public void start(Stage stage) {
         stage.setTitle("Analyse statique - TP HAI913I");
-
+        
+        /**  Cette partie permet d'avoir une structure sous forme de tableau **/
         statsTable = new TableView<>();
         TableColumn<StatRow, String> nameCol = new TableColumn<>("Nom");
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -72,21 +73,24 @@ public class MainFX extends Application {
         progress.setVisible(false);
         progress.setPrefSize(24, 24);
 
-        // Choisir le dossier
+        /** --------------- Choix du projet --------------- **/
         chooseBtn.setOnAction(ev -> {
+        	/* Ouvre une boîte de dialogue pour sélectionner un dossier et affichage avec showDialog() */
             DirectoryChooser dc = new DirectoryChooser();
             dc.setTitle("Sélectionner un projet");
             File dir = dc.showDialog(stage);
+            /* Si un dossier a été sélectionné par l'utilisateur */
             if (dir != null) {
-                selectedDir = dir;
+                selectedDir = dir;  // Mémorise le dossier choisi
                 folderLabel.setText("Dossier: " + dir.getAbsolutePath());
                 analyzeBtn.setDisable(false);
                 graphBtn.setDisable(true);
-                outputArea.clear();
+                outputArea.clear(); // Vide la zone de texte des résultats précédents
             }
         });
 
-        // Analyse
+        /** --------------- Lancement de l'analyse --------------- **/
+        
         analyzeBtn.setOnAction(ev -> {
             if (selectedDir == null) return;
             outputArea.clear();
@@ -103,14 +107,14 @@ public class MainFX extends Application {
                         Parser parser = new Parser(selectedDir.getAbsolutePath());
                         List<CompilationUnit> units = parser.parseProject();
 
-                        // Stats
+                        /** --------------- Résultat statistique --------------- **/
                         StatisticsCollector stats = new StatisticsCollector(units);
                         stats.collect();
-                        Map<String, Integer> statMap = stats.getStatsMap(); // Ajoute cette méthode dans StatisticsCollector
+                        Map<String, Integer> statMap = stats.getStatsMap();
                         ObservableList<StatRow> statRows = FXCollections.observableArrayList();
                         statMap.forEach((k, v) -> statRows.add(new StatRow(k, v)));
 
-                        // Graphe d'appel
+                        /** --------------- Graphe d'appel --------------- **/
                         CallGraphBuilder builder = new CallGraphBuilder();
                         builder.build(units);
                         currentGraph = builder.getCallGraph();
@@ -152,7 +156,8 @@ public class MainFX extends Application {
             t.start();
         });
         
-        // Affichage du graphe dans une nouvelle fenêtre
+        /** --------------- Affichage du graphe d'appel dans une nouvelle fenêtre --------------- **/
+        
         graphBtn.setOnAction(ev -> {
             if (currentGraph != null && !currentGraph.isEmpty()) {
                 GraphView.showGraph(currentGraph);
@@ -165,7 +170,11 @@ public class MainFX extends Application {
         Label advancedLabel = new Label("Analyses avancées");
         HBox controls = new HBox(10, chooseBtn, analyzeBtn, graphBtn, progress);
         controls.setAlignment(Pos.CENTER_LEFT);
+        
+        /** --------------- Conteneur de mise en place JavaFX --------------- **/
+        
         VBox root = new VBox(10, folderLabel, controls, statsLabel, statsTable, new Separator(), advancedLabel, outputArea);
+        
         root.setPadding(new Insets(10));
         Scene scene = new Scene(root, 900, 600);
         stage.setScene(scene);
@@ -177,6 +186,11 @@ public class MainFX extends Application {
         VBox.setVgrow(outputArea, Priority.ALWAYS);
     }
 
+    /**  --------------- Classe utilitaire qui facilite l’affichage des statistiques dans le tableau de l’interface graphique.  --------------- 
+
+    /** Permet au TableView d’afficher proprement chaque statistique dans une ligne du tableau avec une colonne pour le nom et une pour la valeur.
+     */
+    
     public static class StatRow {
         private final String name;
         private final Integer value;
