@@ -32,6 +32,7 @@ import javafx.scene.control.Separator;
 import javafx.scene.layout.Priority;
 
 /* Interface JavaFX */
+
 public class MainFX extends Application {
 
     private TextArea outputArea;
@@ -48,6 +49,7 @@ public class MainFX extends Application {
         stage.setTitle("Analyse statique - TP HAI913I");
         
         /**  Cette partie permet d'avoir une structure sous forme de tableau **/
+        
         statsTable = new TableView<>();
         TableColumn<StatRow, String> nameCol = new TableColumn<>("Nom");
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -74,12 +76,17 @@ public class MainFX extends Application {
         progress.setPrefSize(24, 24);
 
         /** --------------- Choix du projet --------------- **/
+        
         chooseBtn.setOnAction(ev -> {
+        	
         	/* Ouvre une boîte de dialogue pour sélectionner un dossier et affichage avec showDialog() */
+        	
             DirectoryChooser dc = new DirectoryChooser();
             dc.setTitle("Sélectionner un projet");
             File dir = dc.showDialog(stage);
+            
             /* Si un dossier a été sélectionné par l'utilisateur */
+            
             if (dir != null) {
                 selectedDir = dir;  // Mémorise le dossier choisi
                 folderLabel.setText("Dossier: " + dir.getAbsolutePath());
@@ -108,6 +115,7 @@ public class MainFX extends Application {
                         List<CompilationUnit> units = parser.parseProject();
 
                         /** --------------- Résultat statistique --------------- **/
+                        
                         StatisticsCollector stats = new StatisticsCollector(units);
                         stats.collect();
                         Map<String, Integer> statMap = stats.getStatsMap();
@@ -115,6 +123,7 @@ public class MainFX extends Application {
                         statMap.forEach((k, v) -> statRows.add(new StatRow(k, v)));
 
                         /** --------------- Graphe d'appel --------------- **/
+                        
                         CallGraphBuilder builder = new CallGraphBuilder();
                         builder.build(units);
                         currentGraph = builder.getCallGraph();
@@ -160,9 +169,11 @@ public class MainFX extends Application {
         
         graphBtn.setOnAction(ev -> {
             if (currentGraph != null && !currentGraph.isEmpty()) {
-                GraphView.showGraph(currentGraph);
+                javafx.application.Platform.runLater(() -> GraphView.showGraph(currentGraph));
+                // Sysout pour tester
+                System.out.println("Ouverture du graphe depuis javafx");
             } else {
-                outputArea.setText("Aucun graphe à afficher. Lancez une analyse d'abord.");
+                outputArea.setText("Aucun graphe à afficher. Lancez d'abord une analyse.");
             }
         });
 
@@ -173,7 +184,8 @@ public class MainFX extends Application {
         
         /** --------------- Conteneur de mise en place JavaFX --------------- **/
         
-        VBox root = new VBox(10, folderLabel, controls, statsLabel, statsTable, new Separator(), advancedLabel, outputArea);
+        VBox root = new VBox(10, folderLabel, controls, new Separator(), statsLabel, statsTable, new Separator(), advancedLabel,outputArea
+        	);
         
         root.setPadding(new Insets(10));
         Scene scene = new Scene(root, 900, 600);
@@ -186,9 +198,10 @@ public class MainFX extends Application {
         VBox.setVgrow(outputArea, Priority.ALWAYS);
     }
 
-    /**  --------------- Classe utilitaire qui facilite l’affichage des statistiques dans le tableau de l’interface graphique.  --------------- 
+    /**  --------------- Classe utilitaire qui facilite l’affichage des statistiques dans le tableau de l’interface graphique.  --------------- */
 
-    /** Permet au TableView d’afficher proprement chaque statistique dans une ligne du tableau avec une colonne pour le nom et une pour la valeur.
+    /** Permet au TableView d’afficher proprement chaque statistique dans une ligne du tableau avec une colonne pour 
+     * le nom ('name') et une pour la valeur ('value').
      */
     
     public static class StatRow {

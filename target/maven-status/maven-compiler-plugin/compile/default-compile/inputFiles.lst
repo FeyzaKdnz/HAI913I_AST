@@ -1,10 +1,10 @@
-/Users/karadeniz/Desktop/TP_HAI913I/src/main/java/analyser/Parser.java
-/Users/karadeniz/Desktop/TP_HAI913I/src/main/java/analyser/visitors/FieldDeclarationVisitor.java
 /Users/karadeniz/Desktop/TP_HAI913I/src/main/java/analyser/CallGraphBuilder.java
+/Users/karadeniz/Desktop/TP_HAI913I/src/main/java/analyser/Parser.java
 /Users/karadeniz/Desktop/TP_HAI913I/src/main/java/analyser/StatisticsCollector.java
-/Users/karadeniz/Desktop/TP_HAI913I/src/main/java/ui/MainApp.java
-/Users/karadeniz/Desktop/TP_HAI913I/src/main/java/analyser/visitors/MethodInvocationVisitor.java
-/Users/karadeniz/Desktop/TP_HAI913I/src/main/java/ui/MainFX.java
-/Users/karadeniz/Desktop/TP_HAI913I/src/main/java/ui/GraphView.java
+/Users/karadeniz/Desktop/TP_HAI913I/src/main/java/analyser/visitors/FieldDeclarationVisitor.java
 /Users/karadeniz/Desktop/TP_HAI913I/src/main/java/analyser/visitors/MethodDeclarationVisitor.java
+/Users/karadeniz/Desktop/TP_HAI913I/src/main/java/analyser/visitors/MethodInvocationVisitor.java
 /Users/karadeniz/Desktop/TP_HAI913I/src/main/java/analyser/visitors/TypeDeclarationVisitor.java
+/Users/karadeniz/Desktop/TP_HAI913I/src/main/java/ui/GraphView.java
+/Users/karadeniz/Desktop/TP_HAI913I/src/main/java/ui/MainApp.java
+/Users/karadeniz/Desktop/TP_HAI913I/src/main/java/ui/MainFX.java

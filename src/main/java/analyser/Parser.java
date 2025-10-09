@@ -17,12 +17,18 @@ public class Parser {
 
     private final String projectPath;
     private final String sourcePath;
-    private final String jrePath;
 
     public Parser(String projectPath) {
         this.projectPath = projectPath;
-        this.sourcePath = projectPath + File.separator + "src" + File.separator + "main" + File.separator + "java";
-        this.jrePath = System.getProperty("java.home") + File.separator + "lib" + File.separator + "rt.jar";
+        
+        File mainJava = new File(projectPath, "src/main/java");
+        File src = new File(projectPath, "src");
+        
+        if (mainJava.exists()) {
+            this.sourcePath = mainJava.getAbsolutePath();
+        } else {
+            this.sourcePath = src.getAbsolutePath();
+        }
     }
 
     /**
@@ -35,6 +41,7 @@ public class Parser {
 
         for (File file : javaFiles) {
             String content = Files.readString(file.toPath());
+            if (content.isBlank()) continue;
             CompilationUnit unit = parse(content.toCharArray());
             units.add(unit);
         }
@@ -68,7 +75,7 @@ public class Parser {
      * Construit un AST (CompilationUnit) pour une classe donnée.
      */
     private CompilationUnit parse(char[] source) {
-        ASTParser parser = ASTParser.newParser(AST.JLS4);
+    	ASTParser parser = ASTParser.newParser(AST.JLS4);;
         parser.setKind(ASTParser.K_COMPILATION_UNIT);
         parser.setResolveBindings(true);
         parser.setBindingsRecovery(true);
@@ -79,7 +86,7 @@ public class Parser {
 
         parser.setUnitName(""); // nécessaire pour setEnvironment
         String[] sources = { sourcePath };
-        String[] classpath = { jrePath };
+        String[] classpath = {};
 
         parser.setEnvironment(classpath, sources, new String[] { "UTF-8" }, true);
         parser.setSource(source);
@@ -98,7 +105,7 @@ public class Parser {
         Parser parser = new Parser(path);
         List<CompilationUnit> units = parser.parseProject();
 
-        System.out.println("Projet analysé : " + path);
-        System.out.println("Fichiers parsés : " + units.size());
+        System.out.println("Projet analysé: " + path);
+        System.out.println("Fichiers parsés: " + units.size());
     }
 }

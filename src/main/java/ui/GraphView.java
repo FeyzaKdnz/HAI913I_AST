@@ -1,69 +1,83 @@
 package ui;
 
-import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
-import javafx.scene.text.Text;
+import javafx.application.Application;
 import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.ui.fx_viewer.FxViewer;
+import org.graphstream.ui.fx_viewer.FxViewPanel;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * Graphe d'appel dessiné avec JavaFX (sans dépendances externes).
+ * Affiche le graphe d'appel en utilisant GraphStream + JavaFX.
  */
-public class GraphView {
+public class GraphView extends Application {
 
-    public static void showGraph(Map<String, Set<String>> callGraph) {
-        Stage stage = new Stage();
-        stage.setTitle("Graphe d'appel (JavaFX)");
+    private static Map<String, Set<String>> callGraph;
 
-        Pane root = new Pane();
-        Scene scene = new Scene(root, 900, 700, Color.WHITE);
-        stage.setScene(scene);
-
-        // Positionnement automatique des noeuds sur un cercle
-        int n = callGraph.keySet().size();
-        double centerX = 450, centerY = 350, radius = 250;
-        double angleStep = 2 * Math.PI / Math.max(n, 1);
-
-        // Map pour stocker les positions
-        Map<String, double[]> positions = new HashMap<>();
-        int i = 0;
-        for (String node : callGraph.keySet()) {
-            double x = centerX + radius * Math.cos(i * angleStep);
-            double y = centerY + radius * Math.sin(i * angleStep);
-            positions.put(node, new double[]{x, y});
-            i++;
+    public static void showGraph(Map<String, Set<String>> graphData) {
+        callGraph = graphData;
+        if (javafx.application.Platform.isFxApplicationThread()) {
+            new GraphView().showGraphStage();
+        } else {
+            launch(); 
         }
+    }
 
-        // Dessiner les arêtes (lignes)
-        for (var entry : callGraph.entrySet()) {
-            String caller = entry.getKey();
-            for (String callee : entry.getValue()) {
-                double[] p1 = positions.get(caller);
-                double[] p2 = positions.get(callee);
-                if (p1 != null && p2 != null) {
-                    Line line = new Line(p1[0], p1[1], p2[0], p2[1]);
-                    line.setStroke(Color.GRAY);
-                    line.setStrokeWidth(1.5);
-                    root.getChildren().add(line);
-                }
+    @Override
+    public void start(Stage stage) {
+        showGraphStage(stage);
+    }
+
+    public void showGraphStage() {
+        Stage stage = new Stage();
+        showGraphStage(stage);
+    }
+
+    private void showGraphStage(Stage stage) {
+        stage.setTitle("Graphe d'appel (GraphStream)");
+
+        /* Création du graphe */
+        
+        Graph graph = new SingleGraph("CallGraph");
+
+        /* Style CSS intégré */
+        
+        graph.setAttribute("ui.stylesheet",
+            "node { " +
+            "fill-color: #b0383cff; size: 25px; text-size: 14px; text-color: black; text-alignment: above; stroke-mode: plain; stroke-color: black; }" +
+            "edge { fill-color: #999; arrow-shape: arrow; arrow-size: 10px, 5px; }"
+        );
+
+        /* Construction du graphe à partir de la map callGraph */
+        
+        for (String caller : callGraph.keySet()) {
+            if (graph.getNode(caller) == null)
+                graph.addNode(caller).setAttribute("ui.label", caller);
+
+            for (String callee : callGraph.get(caller)) {
+                if (graph.getNode(callee) == null)
+                    graph.addNode(callee).setAttribute("ui.label", callee);
+
+                String edgeId = caller + "->" + callee;
+                if (graph.getEdge(edgeId) == null)
+                    graph.addEdge(edgeId, caller, callee, true);
             }
         }
 
-        // Dessiner les noeuds (cercles + noms)
-        for (var entry : positions.entrySet()) {
-            String node = entry.getKey();
-            double[] pos = entry.getValue();
-            Circle circle = new Circle(pos[0], pos[1], 20, Color.web("#317AC1"));
-            circle.setStroke(Color.BLACK);
-            Text label = new Text(pos[0] - 30, pos[1] - 25, node);
-            label.setFill(Color.BLACK);
-            root.getChildren().addAll(circle, label);
-        }
+        /* Création du viewer JavaFX */
+        
+        FxViewer viewer = new FxViewer(graph, FxViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
+        viewer.enableAutoLayout();
+        FxViewPanel panel = (FxViewPanel) viewer.addDefaultView(false);
 
+        BorderPane root = new BorderPane(panel);
+        Scene scene = new Scene(root, 900, 700);
+        stage.setScene(scene);
         stage.show();
     }
 }

@@ -1,40 +1,53 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>org.example</groupId>
-    <artifactId>TP1_HAI913I</artifactId>
+    <artifactId>TP1_1</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <!-- Version du JDK -->
+        <!-- Si tu utilises JDK 17 -->
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <javafx.version>21.0.2</javafx.version> <!--version JavaFX -->
-        <javafx.platform>mac</javafx.platform>
+        <javafx.version>21.0.2</javafx.version>
+        <javafx.platform>mac</javafx.platform> <!-- change selon ton OS : mac, win, linux -->
     </properties>
 
     <dependencies>
 
-        <!-- Librairies Eclipse JDT (analyse AST) -->
+        <!-- Eclipse JDT Core (analyse AST) -->
         <dependency>
             <groupId>org.eclipse.jdt</groupId>
             <artifactId>org.eclipse.jdt.core</artifactId>
-            <version>3.32.0</version> <!-- version récente -->
+            <version>3.32.0</version>
         </dependency>
 
-        <!-- Utilitaire pour lire les fichiers -->
+        <!-- Eclipse Core Runtime -->
+        <dependency>
+            <groupId>org.eclipse.platform</groupId>
+            <artifactId>org.eclipse.core.runtime</artifactId>
+            <version>3.27.0</version>
+        </dependency>
+
+        <!-- Eclipse Core Resources (corrige ton erreur IResource) -->
+        <dependency>
+            <groupId>org.eclipse.platform</groupId>
+            <artifactId>org.eclipse.core.resources</artifactId>
+            <version>3.16.0</version>
+        </dependency>
+
+        <!-- Commons IO (lecture/écriture fichiers) -->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.11.0</version>
         </dependency>
 
-        <!-- Interface JavaFX -->
+        <!-- JavaFX (pour ton UI) -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -42,19 +55,23 @@
             <classifier>${javafx.platform}</classifier>
         </dependency>
 
+        <!-- GraphStream (visualisation des graphes d'appels) -->
         <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-fxml</artifactId>
-            <version>${javafx.version}</version>
-            <classifier>${javafx.platform}</classifier>
+            <groupId>org.graphstream</groupId>
+            <artifactId>gs-core</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.graphstream</groupId>
+            <artifactId>gs-ui-javafx</artifactId>
+            <version>2.0</version>
         </dependency>
 
     </dependencies>
 
     <build>
         <plugins>
-
-            <!-- Plugin JavaFX -->
+            <!-- Plugin Maven pour exécuter facilement JavaFX -->
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
@@ -63,18 +80,6 @@
                     <mainClass>ui.MainFX</mainClass>
                 </configuration>
             </plugin>
-
-            <!-- Plugin compiler -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                </configuration>
-            </plugin>
-
         </plugins>
     </build>
 

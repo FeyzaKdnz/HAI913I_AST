@@ -4,8 +4,10 @@ import analyser.Parser;
 import analyser.StatisticsCollector;
 import analyser.CallGraphBuilder;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-
+import ui.GraphView;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class MainApp {
     public static void main(String[] args) throws Exception {
@@ -29,6 +31,9 @@ public class MainApp {
         // GRAPHE D'APPEL
         CallGraphBuilder builder = new CallGraphBuilder();
         builder.build(units);
-        builder.printGraph();
+        Map<String, Set<String>> callGraph = builder.getCallGraph();
+
+        // Affichage graphique
+        ui.GraphView.showGraph(callGraph);
     }
 }

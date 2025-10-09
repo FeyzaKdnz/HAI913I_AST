@@ -162,7 +162,8 @@ public class StatisticsCollector {
 
     public Set<String> getPackages() { return packages; }
 
-    // Classes internes pour stocker les stats =================
+    /* ---------------- Classes internes pour stocker les stats ------------- */
+    
     public static class ClassStats {
         String name;
         int methodCount;
@@ -186,6 +187,7 @@ public class StatisticsCollector {
     }
 
     public Map<String, Integer> getStatsMap() {
+    	
     Map<String, Integer> stats = new LinkedHashMap<>();
     stats.put("Nombre de classes", classes.size());
     stats.put("Nombre de packages", packages.size());
