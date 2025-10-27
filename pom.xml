@@ -9,12 +9,11 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <!-- Si tu utilises JDK 17 -->
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javafx.version>21.0.2</javafx.version>
-        <javafx.platform>mac</javafx.platform> <!-- change selon ton OS : mac, win, linux -->
+        <javafx.platform>mac</javafx.platform>
     </properties>
 
     <dependencies>
@@ -33,7 +32,7 @@
             <version>3.27.0</version>
         </dependency>
 
-        <!-- Eclipse Core Resources (corrige ton erreur IResource) -->
+        <!-- Eclipse Core Resources -->
         <dependency>
             <groupId>org.eclipse.platform</groupId>
             <artifactId>org.eclipse.core.resources</artifactId>
@@ -47,7 +46,7 @@
             <version>2.11.0</version>
         </dependency>
 
-        <!-- JavaFX (pour ton UI) -->
+        <!-- JavaFX (pour UI) -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>

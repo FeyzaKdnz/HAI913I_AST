@@ -15,11 +15,9 @@ import java.util.*;
  */
 public class Parser {
 
-    private final String projectPath;
     private final String sourcePath;
 
     public Parser(String projectPath) {
-        this.projectPath = projectPath;
         
         File mainJava = new File(projectPath, "src/main/java");
         File src = new File(projectPath, "src");
@@ -75,7 +73,7 @@ public class Parser {
      * Construit un AST (CompilationUnit) pour une classe donnée.
      */
     private CompilationUnit parse(char[] source) {
-    	ASTParser parser = ASTParser.newParser(AST.JLS4);;
+    	ASTParser parser = ASTParser.newParser(AST.getJLSLatest());;
         parser.setKind(ASTParser.K_COMPILATION_UNIT);
         parser.setResolveBindings(true);
         parser.setBindingsRecovery(true);

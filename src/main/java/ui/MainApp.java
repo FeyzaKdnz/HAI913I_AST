@@ -1,10 +1,10 @@
 package ui;
 
+import analyser.CouplingGraphBuilder;
 import analyser.Parser;
 import analyser.StatisticsCollector;
 import analyser.CallGraphBuilder;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import ui.GraphView;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,7 +33,12 @@ public class MainApp {
         builder.build(units);
         Map<String, Set<String>> callGraph = builder.getCallGraph();
 
-        // Affichage graphique
+        // AFFICHAGE GRAPHIQUE
         ui.GraphView.showGraph(callGraph);
+
+        // TP2: couplage des classes
+        CouplingGraphBuilder couplingBuilder = new CouplingGraphBuilder(callGraph);
+        couplingBuilder.buildCouplingGraph();
+        couplingBuilder.printCouplingGraph();
     }
 }

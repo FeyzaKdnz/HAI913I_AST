@@ -1,9 +1,11 @@
 package ui;
 
+import analyser.HierarchicalClustering;
 import analyser.Parser;
 import analyser.StatisticsCollector;
 import analyser.CallGraphBuilder;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import analyser.CouplingGraphBuilder;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -15,6 +17,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TextField;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
@@ -31,25 +34,23 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.Priority;
 
-/* Interface JavaFX */
-
 public class MainFX extends Application {
 
     private TextArea outputArea;
     private File selectedDir;
     private Map<String, Set<String>> currentGraph;
     private TableView<StatRow> statsTable;
+    private Map<String, Map<String, Double>> currentCouplingGraph;
+    private TextField cpThresholdField;
 
     public static void main(String[] args) {
         launch(args);
     }
-    
+
     @Override
     public void start(Stage stage) {
         stage.setTitle("Analyse statique - TP HAI913I");
-        
-        /**  Cette partie permet d'avoir une structure sous forme de tableau **/
-        
+
         statsTable = new TableView<>();
         TableColumn<StatRow, String> nameCol = new TableColumn<>("Nom");
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -66,38 +67,35 @@ public class MainFX extends Application {
         Button chooseBtn = new Button("Choisir projet..");
         Button analyzeBtn = new Button("Analyser");
         Button graphBtn = new Button("Afficher le graphe");
+        Button couplingBtn = new Button("Afficher le graphe de couplage");
+        Button clusteringBtn = new Button("Identifier les Modules");
+
+        cpThresholdField = new TextField("0.05");
+        cpThresholdField.setPrefWidth(60);
+
         analyzeBtn.setDisable(true);
         graphBtn.setDisable(true);
-        outputArea.setEditable(false);
-        outputArea.setWrapText(true);
+        couplingBtn.setDisable(true);
+        clusteringBtn.setDisable(true);
+        cpThresholdField.setDisable(true);
 
         ProgressIndicator progress = new ProgressIndicator();
         progress.setVisible(false);
         progress.setPrefSize(24, 24);
 
-        /** --------------- Choix du projet --------------- **/
-        
         chooseBtn.setOnAction(ev -> {
-        	
-        	/* Ouvre une boîte de dialogue pour sélectionner un dossier et affichage avec showDialog() */
-        	
             DirectoryChooser dc = new DirectoryChooser();
             dc.setTitle("Sélectionner un projet");
             File dir = dc.showDialog(stage);
-            
-            /* Si un dossier a été sélectionné par l'utilisateur */
-            
             if (dir != null) {
-                selectedDir = dir;  // Mémorise le dossier choisi
+                selectedDir = dir;
                 folderLabel.setText("Dossier: " + dir.getAbsolutePath());
                 analyzeBtn.setDisable(false);
                 graphBtn.setDisable(true);
-                outputArea.clear(); // Vide la zone de texte des résultats précédents
+                outputArea.clear();
             }
         });
 
-        /** --------------- Lancement de l'analyse --------------- **/
-        
         analyzeBtn.setOnAction(ev -> {
             if (selectedDir == null) return;
             outputArea.clear();
@@ -105,6 +103,9 @@ public class MainFX extends Application {
             analyzeBtn.setDisable(true);
             chooseBtn.setDisable(true);
             graphBtn.setDisable(true);
+            couplingBtn.setDisable(true);
+            clusteringBtn.setDisable(true);
+            cpThresholdField.setDisable(true);
             statsTable.getItems().clear();
 
             javafx.concurrent.Task<Void> task = new javafx.concurrent.Task<>() {
@@ -114,42 +115,34 @@ public class MainFX extends Application {
                         Parser parser = new Parser(selectedDir.getAbsolutePath());
                         List<CompilationUnit> units = parser.parseProject();
 
-                        /** --------------- Résultat statistique --------------- **/
-                        
                         StatisticsCollector stats = new StatisticsCollector(units);
                         stats.collect();
                         Map<String, Integer> statMap = stats.getStatsMap();
                         ObservableList<StatRow> statRows = FXCollections.observableArrayList();
                         statMap.forEach((k, v) -> statRows.add(new StatRow(k, v)));
 
-                        /** --------------- Graphe d'appel --------------- **/
-                        
                         CallGraphBuilder builder = new CallGraphBuilder();
                         builder.build(units);
                         currentGraph = builder.getCallGraph();
 
-                        String report = stats.generateReport();
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("Fichiers parsés: ").append(units.size()).append("\n\n");
-                        sb.append(report).append("\n");
-                        sb.append("--- Graphe d'appel (texte) ---\n");
-                        if (currentGraph.isEmpty()) {
-                            sb.append("(aucun appel détecté)\n");
-                        } else {
-                            currentGraph.forEach((caller, callees) ->
-                                sb.append(caller).append(" appelle: ").append(callees).append("\n")
-                            );
-                        }
+                        CouplingGraphBuilder couplingBuilder = new CouplingGraphBuilder(currentGraph);
+                        couplingBuilder.buildCouplingGraph();
+                        currentCouplingGraph = couplingBuilder.getCouplingGraph();
 
-                        final String finalText = sb.toString();
+                        // ... (rest of the analysis text generation) ...
+
                         javafx.application.Platform.runLater(() -> {
                             statsTable.setItems(statRows);
-                            outputArea.setText(finalText);
+                            // outputArea.setText(finalText);
                             graphBtn.setDisable(false);
+                            couplingBtn.setDisable(false);
+                            clusteringBtn.setDisable(false);
+                            cpThresholdField.setDisable(false);
                         });
+
                     } catch (Exception ex) {
                         javafx.application.Platform.runLater(() ->
-                            outputArea.setText("Erreur lors de l'analyse: " + ex.getClass().getSimpleName() + ex.getMessage()));
+                            outputArea.setText("Erreur lors de l'analyse: " + ex.getClass().getSimpleName() + " " + ex.getMessage()));
                     } finally {
                         javafx.application.Platform.runLater(() -> {
                             progress.setVisible(false);
@@ -160,50 +153,65 @@ public class MainFX extends Application {
                     return null;
                 }
             };
-            Thread t = new Thread(task);
-            t.setDaemon(true);
-            t.start();
+            new Thread(task).start();
         });
-        
-        /** --------------- Affichage du graphe d'appel dans une nouvelle fenêtre --------------- **/
-        
+
         graphBtn.setOnAction(ev -> {
             if (currentGraph != null && !currentGraph.isEmpty()) {
                 javafx.application.Platform.runLater(() -> GraphView.showGraph(currentGraph));
-                // Sysout pour tester
-                System.out.println("Ouverture du graphe depuis javafx");
             } else {
-                outputArea.setText("Aucun graphe à afficher. Lancez d'abord une analyse.");
+                outputArea.setText("Aucun graphe à afficher.");
+            }
+        });
+
+        couplingBtn.setOnAction(ev -> {
+            if (currentCouplingGraph != null && !currentCouplingGraph.isEmpty()) {
+                javafx.application.Platform.runLater(() ->
+                        CouplingGraphView.showCouplingGraph(currentCouplingGraph)
+                );
+            } else {
+                outputArea.appendText("\nAucun graphe de couplage à afficher.\n");
+            }
+        });
+
+        clusteringBtn.setOnAction(ev -> {
+            if (currentCouplingGraph == null || currentCouplingGraph.isEmpty()) {
+                outputArea.appendText("\nAucun graphe de couplage disponible. Lancez d'abord l'analyse.\n");
+                return;
+            }
+            try {
+                double cp = Double.parseDouble(cpThresholdField.getText());
+                outputArea.appendText("\n\n--- Identification des modules (CP = " + cp + ") ---\n");
+
+                HierarchicalClustering clustering = new HierarchicalClustering(currentCouplingGraph);
+                HierarchicalClustering.DendrogramNode root = clustering.cluster();
+                List<Set<String>> modules = clustering.identifyModules(root, cp);
+
+                StringBuilder result = new StringBuilder();
+                result.append("Nombre de modules identifiés: ").append(modules.size()).append("\n");
+                int moduleCount = 1;
+                for (Set<String> module : modules) {
+                    result.append("  - Module ").append(moduleCount++).append(": ").append(module).append("\n");
+                }
+                outputArea.appendText(result.toString());
+
+            } catch (NumberFormatException e) {
+                outputArea.appendText("\nErreur: La valeur de CP doit être un nombre valide (ex: 0.05).\n");
             }
         });
 
         Label statsLabel = new Label("Statistiques globales");
         Label advancedLabel = new Label("Analyses avancées");
-        HBox controls = new HBox(10, chooseBtn, analyzeBtn, graphBtn, progress);
+        HBox controls = new HBox(10, chooseBtn, analyzeBtn, graphBtn, couplingBtn, new Label("CP:"), cpThresholdField, clusteringBtn, progress);
         controls.setAlignment(Pos.CENTER_LEFT);
-        
-        /** --------------- Conteneur de mise en place JavaFX --------------- **/
-        
-        VBox root = new VBox(10, folderLabel, controls, new Separator(), statsLabel, statsTable, new Separator(), advancedLabel,outputArea
-        	);
-        
+
+        VBox root = new VBox(10, folderLabel, controls, new Separator(), statsLabel, statsTable, new Separator(), advancedLabel, outputArea);
         root.setPadding(new Insets(10));
         Scene scene = new Scene(root, 900, 600);
         stage.setScene(scene);
         stage.show();
-        statsTable.getItems().clear();
-        statsTable.setPrefHeight(200);
-        outputArea.setPrefHeight(250);
-        VBox.setVgrow(statsTable, Priority.ALWAYS);
-        VBox.setVgrow(outputArea, Priority.ALWAYS);
     }
 
-    /**  --------------- Classe utilitaire qui facilite l’affichage des statistiques dans le tableau de l’interface graphique.  --------------- */
-
-    /** Permet au TableView d’afficher proprement chaque statistique dans une ligne du tableau avec une colonne pour 
-     * le nom ('name') et une pour la valeur ('value').
-     */
-    
     public static class StatRow {
         private final String name;
         private final Integer value;
