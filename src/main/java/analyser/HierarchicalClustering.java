@@ -124,7 +124,6 @@ public class HierarchicalClustering {
         List<Set<String>> modules = new ArrayList<>();
         Queue<DendrogramNode> queue = new LinkedList<>();
         queue.add(root);
-
         int M = root.size();
 
         while (!queue.isEmpty()) {
@@ -134,10 +133,8 @@ public class HierarchicalClustering {
                 modules.add(node.getClasses());
                 continue;
             }
-
             /* Calcul de la cohésion interne du noeud */
             double averageCoupling = calculateAverageInternalCoupling(node.getClasses());
-
             /* Si cohésion est suffisante, on valide le module et on n'explore pas ses enfants */
             if (averageCoupling > couplingThresholdCP) {
                 modules.add(node.getClasses());
@@ -148,7 +145,6 @@ public class HierarchicalClustering {
                 queue.add(mergedNode.getRight());
             }
         }
-
         if (modules.size() > M / 2) {
             System.out.println("Le nombre de modules (" + modules.size() + ") dépasse M/2 (" + (M/2) + "). Essayez d'augmenter le seuil CP.");
         }

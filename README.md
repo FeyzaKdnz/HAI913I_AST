@@ -2,11 +2,11 @@
 <p>
 </p>
 
-> HAI913I_AST est une application d’analyse statique permettant de visualiser et d’explorer la structure interne de vos projets Java à travers un modèle Abstract Syntax Tree (AST) basé sur Eclipse JDT.
+> HAI913I_AST est une application d’analyse statique permettant de visualiser et d’explorer la structure interne de vos projets Java à travers un modèle Abstract Syntax Tree (AST) basé sur Eclipse JDT. 
 
 🏠 Page d'accueil: https://github.com/FeyzaKdnz/HAI913I_AST
 
-✨ Démonstration: https://drive.google.com/file/d/154OMfOpobjVjwUedxiKdC0xOF471ZbGJ/view?usp=sharing
+✨ Démonstration: https://drive.google.com/file/d/1txdndsePHzPqCxRgWruVbiVW5owj-PHe/view?usp=sharing
 
 ## Usage
 
@@ -48,6 +48,9 @@ Le chemin devrait s'afficher après avoir sélectionné votre dossier.
 Cliquer sur "Analyser" pour lancer l'analyse.
 
 Vous pouvez visualiser le graphe en cliquant sur "Afficher le graphe".
+
+Vous pouvez également afficher le graphe de couplage en cliquant sur "Afficher le graphe de couplage".
+
 
 ## Author
 Feyza Karadeniz
